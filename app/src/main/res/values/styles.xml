@@ -8,8 +8,4 @@
         <item name="colorAccent">@color/colorAccent</item>
     </style>
 
-    <style name="LoadingTheme" parent="android:style/Theme.NoTitleBar.Fullscreen">
-        <item name="android:windowBackground">@drawable/redic</item>
-    </style>
-
 </resources>
