@@ -2,6 +2,7 @@ package com.example.jinhyukkim.landiary_and;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.PixelFormat;
 import android.hardware.Camera;
 import android.os.Bundle;
@@ -9,7 +10,9 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.Button;
 import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.RelativeLayout;
 
 import java.io.IOException;
@@ -21,12 +24,16 @@ import java.io.IOException;
 public class BaseActivity extends Activity implements View.OnClickListener, SurfaceHolder.Callback {
 
     private RelativeLayout contentView = null;
-    private static Context mCtx = null;
+    public static Context mCtx = null;
 
     private Camera camera;
     SurfaceView surfaceView;
     SurfaceHolder surfaceHolder;
     private Camera mCamera;
+
+    Button Btn_Pathview;
+    ListView listView;
+    boolean list_status = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,6 +58,24 @@ public class BaseActivity extends Activity implements View.OnClickListener, Surf
                 // TODO Auto-generated catch block e.printStackTrace();
             }
         }
+
+        listView = findViewById(R.id.itemlistview);
+        listView.setVisibility(View.GONE);
+
+        Btn_Pathview = findViewById(R.id.Btn_Pathview);
+        Btn_Pathview.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                list_status = !list_status;
+
+                if(list_status) {
+                    listView.setVisibility(View.VISIBLE);
+                }   else    {
+                    listView.setVisibility(View.GONE);
+                }
+
+            }
+        });
     }
 
     @Override
