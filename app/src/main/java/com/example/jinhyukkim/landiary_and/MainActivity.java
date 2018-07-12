@@ -100,6 +100,9 @@ public class MainActivity extends BaseActivity implements TMapGpsManager.onLocat
     ArrayList<String>       mArrayMarkerID;
     private static int 		mMarkerID;
 
+
+    //----------------------통신
+    PathJson pathJson = new PathJson();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -399,6 +402,8 @@ public class MainActivity extends BaseActivity implements TMapGpsManager.onLocat
         mMapView.setTMapPathIcon(start, end);
 
         mMapView.zoomToTMapPoint(point1, point2);
+
+        pathJson.PathPoint_Asycn(point1.getLongitude(), point1.getLatitude(), point2.getLongitude(), point2.getLatitude());
     }
 
     /**

@@ -4,7 +4,7 @@ android {
     compileSdkVersion 26
     defaultConfig {
         applicationId "com.example.jinhyukkim.landiary_and"
-        minSdkVersion 24
+        minSdkVersion 23
         targetSdkVersion 26
         versionCode 1
         versionName "1.0"
@@ -30,4 +30,5 @@ dependencies {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
     api files('libs/com.skt.Tmap_1.0.50.jar')
+    compile 'com.squareup.okhttp3:okhttp:3.8.0'
 }
