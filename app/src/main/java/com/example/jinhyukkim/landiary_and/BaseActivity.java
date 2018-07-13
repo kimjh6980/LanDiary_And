@@ -10,12 +10,16 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
+import android.widget.Toast;
 
 import java.io.IOException;
+
+import static android.media.CamcorderProfile.get;
 
 /**
  * Created by ICDSP on 2018-01-14.
@@ -76,6 +80,15 @@ public class BaseActivity extends Activity implements View.OnClickListener, Surf
 
             }
         });
+
+        /*
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Toast.makeText(getApplicationContext().this)
+            }
+        });
+        */
     }
 
     @Override

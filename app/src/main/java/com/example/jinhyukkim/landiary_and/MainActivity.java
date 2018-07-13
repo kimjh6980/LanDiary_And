@@ -57,6 +57,13 @@ public class MainActivity extends BaseActivity implements TMapGpsManager.onLocat
     TMapPoint Current_Point;
     double getCurrent_long;
     double getCurrent_lat;
+
+    int point_count = 0;
+    ArrayList<Double> pointlist_lat = new ArrayList<>();
+    ArrayList<Double> pointlist_lon = new ArrayList<>();
+    double set_long;
+    double set_lat;
+
     @Override
     public void onLocationChange(Location location) {
         LogManager.printLog("onLocationChange :::> " + location.getLatitude() +  " " +
@@ -73,6 +80,26 @@ public class MainActivity extends BaseActivity implements TMapGpsManager.onLocat
 
             LogManager.printLog("getCurrent_lat : " + getCurrent_lat);
             LogManager.printLog("getCurrent_long : " + getCurrent_long);
+
+            Location locA = new Location("current_L");
+            locA.setLatitude(getCurrent_lat);
+            locA.setLongitude(getCurrent_long);
+
+            Location locB = new Location("dest_L");
+            locB.setLatitude(set_lat);
+            locB.setLongitude(set_long);
+
+            float distance = locA.distanceTo(locB);
+            Log.e("DistanceA_B = ", String.valueOf(distance));  // 두지점 사이의 거리 ( 만약 다음 포인트까지의 거리가 5m이하일 경우, 포인트를 다음 목적 포인트로 넘기는 작업을 할 예정임ㅒㅔ
+
+            if(distance <= 0.05)    {
+                point_count++;
+                set_long = pointlist_lon.get(point_count);
+                set_lat = pointlist_lat.get(point_count);
+                Log.e("Point Count ++ ->", point_count +"/"+ set_long +"/"+ set_lat);
+            }
+
+
         }
     }
 
@@ -119,7 +146,7 @@ public class MainActivity extends BaseActivity implements TMapGpsManager.onLocat
     ArrayList<String>       mArrayMarkerID;
     private static int 		mMarkerID;
 
-
+    private ListView A_List = null;
     //----------------------통신
     PathJson pathJson = new PathJson();
     @Override
@@ -160,6 +187,8 @@ public class MainActivity extends BaseActivity implements TMapGpsManager.onLocat
 
         // Insert A SKT Logo on the Tmap.
         mMapView.setTMapLogoPosition(TMapView.TMapLogoPositon.POSITION_BOTTOMRIGHT);
+
+        A_List = (ListView)findViewById(R.id.itemlistview);
     }
 
 
@@ -401,6 +430,8 @@ public class MainActivity extends BaseActivity implements TMapGpsManager.onLocat
     public void StartGuidance() {
         mMapView.removeTMapPath();
 
+        pointlist_init();
+
         setTrackingMode();
 
         TMapPoint point1 = mMapView.getLocationPoint();
@@ -423,6 +454,15 @@ public class MainActivity extends BaseActivity implements TMapGpsManager.onLocat
         mMapView.zoomToTMapPoint(point1, point2);
 
         pathJson.PathPoint_Asycn(point1.getLongitude(), point1.getLatitude(), point2.getLongitude(), point2.getLatitude());
+
+
+    }
+
+    private void pointlist_init() {
+        point_count = 0;
+        pointlist_lat.clear();
+        pointlist_lon.clear();
+
     }
 
     /**
@@ -589,7 +629,7 @@ public class MainActivity extends BaseActivity implements TMapGpsManager.onLocat
             }
         }
 
-        private ListView A_List = null;
+
 
         public PathJson(JSONObject root) {
             ArrayList<ItemData> A_Data = new ArrayList<>();
@@ -631,6 +671,9 @@ public class MainActivity extends BaseActivity implements TMapGpsManager.onLocat
                         idata.getY = String.valueOf(coord.getDouble(1));
                         A_Data.add(idata);
 
+                        pointlist_lat.add(coord.getDouble(0));
+                        pointlist_lon.add(coord.getDouble(1));
+
                         //popupListItems.add(new PopupListItem(name, description, false, points));----------------------------------------------------------------------------어댑터
                     }
                     /*else if (type.equals("LineString")) {
@@ -667,7 +710,7 @@ public class MainActivity extends BaseActivity implements TMapGpsManager.onLocat
                 Log.d("EXC:", "an error occur while parsing json / " + ex.toString());
             }
 
-            A_List = (ListView)findViewById(R.id.itemlistview);
+
             adapter = new ListAdapter(A_Data);
             runOnUiThread(new Runnable() {
                 @Override
@@ -675,6 +718,9 @@ public class MainActivity extends BaseActivity implements TMapGpsManager.onLocat
                     A_List.setAdapter(adapter);
                 }
             });
+
+            set_lat = pointlist_lat.get(0);
+            set_long = pointlist_lon.get(0);
 
         }
     }
