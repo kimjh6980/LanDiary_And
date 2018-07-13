@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.graphics.PixelFormat;
 import android.hardware.Camera;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.LayoutInflater;

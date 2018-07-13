@@ -5,10 +5,12 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.pm.PackageManager;
+import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.PointF;
+import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.os.AsyncTask;
 import android.os.Build;
@@ -19,7 +21,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.jinhyukkim.landiary_and.List.ItemData;
@@ -58,9 +62,10 @@ public class MainActivity extends BaseActivity implements TMapGpsManager.onLocat
     double getCurrent_long;
     double getCurrent_lat;
 
-    int point_count = 0;
+    int point_count = 1;
     ArrayList<Double> pointlist_lat = new ArrayList<>();
     ArrayList<Double> pointlist_lon = new ArrayList<>();
+    ArrayList<Integer> pointlist_img = new ArrayList<>();
     double set_long;
     double set_lat;
 
@@ -92,16 +97,18 @@ public class MainActivity extends BaseActivity implements TMapGpsManager.onLocat
             float distance = locA.distanceTo(locB);
             Log.e("DistanceA_B = ", String.valueOf(distance));  // 두지점 사이의 거리 ( 만약 다음 포인트까지의 거리가 5m이하일 경우, 포인트를 다음 목적 포인트로 넘기는 작업을 할 예정임ㅒㅔ
 
+            Log.e("Point Count ->", point_count +"/"+ set_long +"/"+ set_lat);
+
             if(distance <= 0.05)    {
                 point_count++;
-                set_long = pointlist_lon.get(point_count);
-                set_lat = pointlist_lat.get(point_count);
+                markerPoint();
                 Log.e("Point Count ++ ->", point_count +"/"+ set_long +"/"+ set_lat);
+                Toast.makeText(getApplicationContext(), "point+="+point_count, Toast.LENGTH_SHORT).show();
             }
-
-
         }
     }
+
+
 
     /**
      *  Field declaration
@@ -138,6 +145,9 @@ public class MainActivity extends BaseActivity implements TMapGpsManager.onLocat
     private 	boolean 	m_bTrackingMode = false;
     private 	boolean 	m_bOverlayMode = false;
 
+    ImageView arrowimg;
+    TextView arrowT;
+
     ArrayList<String> mArrayID;
 
     ArrayList<String>		mArrayLineID;
@@ -172,9 +182,10 @@ public class MainActivity extends BaseActivity implements TMapGpsManager.onLocat
 
         // Gps Open
         gps = new TMapGpsManager(MainActivity.this);
-        gps.setMinTime(1000);
+        gps.setMinTime(500);
         gps.setMinDistance(2);
-        gps.setProvider(gps.NETWORK_PROVIDER);
+        gps.setProvider(gps.NETWORK_PROVIDER);    //네트워크 검색
+        //gps.setProvider(gps.GPS_PROVIDER);
         if(ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)!= PackageManager.PERMISSION_GRANTED
                 && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION)!=PackageManager.PERMISSION_GRANTED){
 
@@ -189,6 +200,8 @@ public class MainActivity extends BaseActivity implements TMapGpsManager.onLocat
         mMapView.setTMapLogoPosition(TMapView.TMapLogoPositon.POSITION_BOTTOMRIGHT);
 
         A_List = (ListView)findViewById(R.id.itemlistview);
+        arrowimg = (ImageView)findViewById(R.id.ArrowImg);
+        arrowT = (TextView)findViewById(R.id.ArrowT);
     }
 
 
@@ -453,13 +466,12 @@ public class MainActivity extends BaseActivity implements TMapGpsManager.onLocat
 
         mMapView.zoomToTMapPoint(point1, point2);
 
-        pathJson.PathPoint_Asycn(point1.getLongitude(), point1.getLatitude(), point2.getLongitude(), point2.getLatitude());
-
-
+        //pathJson.PathPoint_Asycn(point1.getLongitude(), point1.getLatitude(), point2.getLongitude(), point2.getLatitude());
+        pathJson.PathPoint_Asycn(point2.getLongitude(), point2.getLatitude(), point1.getLongitude(), point1.getLatitude());
     }
 
     private void pointlist_init() {
-        point_count = 0;
+        point_count = 1;
         pointlist_lat.clear();
         pointlist_lon.clear();
 
@@ -469,7 +481,9 @@ public class MainActivity extends BaseActivity implements TMapGpsManager.onLocat
      * setCompassMode
      * 단말의 방항에 따라 움직이는 나침반모드로 설정한다.
      */
-    public void setCompassMode() {mMapView.setCompassMode(!mMapView.getIsCompass());}
+    public void setCompassMode() {
+        mMapView.setCompassMode(!mMapView.getIsCompass());
+    }
     ///////////////////////////////////////////////////////////////////////////////////////////////
 
 
@@ -522,6 +536,17 @@ public class MainActivity extends BaseActivity implements TMapGpsManager.onLocat
     //---------------------------------------------------------------------------------------------------------------------------------------
 
     ListAdapter adapter;
+
+    public void mapzoom_in(View view) {
+        mMapView.MapZoomIn();
+    }
+    public void mapzoom_out(View view) {
+        mMapView.MapZoomOut();
+    }
+
+    public void test(View view) {
+
+    }
 
     public class PathJson{
 
@@ -669,10 +694,35 @@ public class MainActivity extends BaseActivity implements TMapGpsManager.onLocat
 
                         idata.getX = String.valueOf(coord.getDouble(0));
                         idata.getY = String.valueOf(coord.getDouble(1));
+                        Drawable drawableimg;
+
+                        switch (turntype)   {
+                            case "0":
+                                drawableimg = getResources().getDrawable(R.drawable.a_0);
+                                break;
+                            case "11":
+                                drawableimg = getResources().getDrawable(R.drawable.a_11);
+                                break;
+                            case "12":
+                                drawableimg = getResources().getDrawable(R.drawable.a_12);
+                                break;
+                            case "13":
+                                drawableimg = getResources().getDrawable(R.drawable.a_13);
+                                break;
+                            case "14":
+                                drawableimg = getResources().getDrawable(R.drawable.a_14);
+                                break;
+                            default:
+                                drawableimg = getResources().getDrawable(R.drawable.a_etc);
+                                break;
+                        }
+                        //idata.arrow.setImageDrawable(drawableimg);
+                        idata.arrow = drawableimg;
                         A_Data.add(idata);
 
                         pointlist_lat.add(coord.getDouble(0));
                         pointlist_lon.add(coord.getDouble(1));
+                        pointlist_img.add(Integer.valueOf(turntype));
 
                         //popupListItems.add(new PopupListItem(name, description, false, points));----------------------------------------------------------------------------어댑터
                     }
@@ -710,7 +760,6 @@ public class MainActivity extends BaseActivity implements TMapGpsManager.onLocat
                 Log.d("EXC:", "an error occur while parsing json / " + ex.toString());
             }
 
-
             adapter = new ListAdapter(A_Data);
             runOnUiThread(new Runnable() {
                 @Override
@@ -719,11 +768,33 @@ public class MainActivity extends BaseActivity implements TMapGpsManager.onLocat
                 }
             });
 
-            set_lat = pointlist_lat.get(0);
-            set_long = pointlist_lon.get(0);
-
+            markerPoint();
         }
     }
 
+    void markerPoint()    {
+        //double lat2 = Double.parseDouble(String.format("%.6f",lat));
+        //double lon2 = Double.parseDouble(String.format("%.6f",lon));
 
+        runOnUiThread(new Runnable() {
+                          @Override
+                          public void run() {
+                              arrowT.setText(adapter.getM(point_count));
+                          }
+                      });
+
+        set_long = pointlist_lon.get(point_count);
+        set_lat = pointlist_lat.get(point_count);
+
+        TMapMarkerItem mapMarkerItem = new TMapMarkerItem();
+
+        TMapPoint tMapPoint = new TMapPoint(set_long, set_lat);
+
+        Bitmap bitmap = BitmapFactory.decodeResource(mContext.getResources(), R.drawable.ic_map_no_02);
+        mapMarkerItem.setIcon(bitmap);
+        mapMarkerItem.setPosition(0.5f, 0.5f);
+        mapMarkerItem.setTMapPoint(tMapPoint);
+        mapMarkerItem.setName(String.valueOf(point_count));
+        mMapView.addMarkerItem("mapMarkerItem", mapMarkerItem);
+    }
 }

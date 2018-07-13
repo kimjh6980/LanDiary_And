@@ -1,5 +1,6 @@
 package com.example.jinhyukkim.landiary_and.List;
 
+import android.graphics.drawable.Drawable;
 import android.widget.ImageView;
 
 /**
@@ -10,5 +11,5 @@ public class ItemData {
     public String MainT;
     public String getX;
     public String getY;
-    public ImageView arrow;
+    public Drawable arrow;
 }
