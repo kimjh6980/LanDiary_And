@@ -4,6 +4,7 @@ import android.Manifest;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
@@ -15,6 +16,7 @@ import android.location.Location;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.support.v4.app.ActivityCompat;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -145,7 +147,9 @@ public class MainActivity extends BaseActivity implements TMapGpsManager.onLocat
     private 	boolean 	m_bTrackingMode = false;
     private 	boolean 	m_bOverlayMode = false;
 
+    Button Capture_btn;
     ImageView arrowimg;
+    TextView dest_t;
     TextView arrowT;
 
     ArrayList<String> mArrayID;
@@ -199,11 +203,20 @@ public class MainActivity extends BaseActivity implements TMapGpsManager.onLocat
         // Insert A SKT Logo on the Tmap.
         mMapView.setTMapLogoPosition(TMapView.TMapLogoPositon.POSITION_BOTTOMRIGHT);
 
+        Capture_btn = (Button)findViewById(R.id.capture_BTN);
         A_List = (ListView)findViewById(R.id.itemlistview);
         arrowimg = (ImageView)findViewById(R.id.ArrowImg);
         arrowT = (TextView)findViewById(R.id.ArrowT);
-    }
+        dest_t = (TextView)findViewById(R.id.Dest_t);
 
+        Capture_btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent landmark_class = new Intent(getApplicationContext(), landMark.class);
+                startActivity(landmark_class);
+            }
+        });
+    }
 
     /**
      * setSKPMapApiKey()에 ApiKey를 입력 한다.
