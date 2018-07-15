@@ -64,7 +64,7 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="bottom|right"
                     android:gravity="right"
-                    android:shadowColor="@android:color/background_light"
+                    android:background="@color/TextBg_White"
                     android:text="경로"
                     android:textColor="@android:color/black" />
 

@@ -789,13 +789,6 @@ public class MainActivity extends BaseActivity implements TMapGpsManager.onLocat
         //double lat2 = Double.parseDouble(String.format("%.6f",lat));
         //double lon2 = Double.parseDouble(String.format("%.6f",lon));
 
-        runOnUiThread(new Runnable() {
-                          @Override
-                          public void run() {
-                              arrowT.setText(adapter.getM(point_count));
-                          }
-                      });
-
         set_long = pointlist_lon.get(point_count);
         set_lat = pointlist_lat.get(point_count);
 
@@ -809,5 +802,38 @@ public class MainActivity extends BaseActivity implements TMapGpsManager.onLocat
         mapMarkerItem.setTMapPoint(tMapPoint);
         mapMarkerItem.setName(String.valueOf(point_count));
         mMapView.addMarkerItem("mapMarkerItem", mapMarkerItem);
+
+        final Drawable drawableimg;
+
+        switch (String.valueOf(pointlist_img.get(point_count)))   {
+            case "0":
+                drawableimg = getResources().getDrawable(R.drawable.a_0);
+                break;
+            case "11":
+                drawableimg = getResources().getDrawable(R.drawable.a_11);
+                break;
+            case "12":
+                drawableimg = getResources().getDrawable(R.drawable.a_12);
+                break;
+            case "13":
+                drawableimg = getResources().getDrawable(R.drawable.a_13);
+                break;
+            case "14":
+                drawableimg = getResources().getDrawable(R.drawable.a_14);
+                break;
+            default:
+                drawableimg = getResources().getDrawable(R.drawable.a_etc);
+                break;
+        }
+
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                arrowT.setText(adapter.getM(point_count));
+                arrowimg.setImageDrawable(drawableimg);
+            }
+        });
+
+
     }
 }
