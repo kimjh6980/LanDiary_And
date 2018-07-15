@@ -64,7 +64,7 @@ public class MainActivity extends BaseActivity implements TMapGpsManager.onLocat
     double getCurrent_long;
     double getCurrent_lat;
 
-    int point_count = 1;
+    int point_count = 0;
     ArrayList<Double> pointlist_lat = new ArrayList<>();
     ArrayList<Double> pointlist_lon = new ArrayList<>();
     ArrayList<Integer> pointlist_img = new ArrayList<>();
@@ -484,7 +484,7 @@ public class MainActivity extends BaseActivity implements TMapGpsManager.onLocat
     }
 
     private void pointlist_init() {
-        point_count = 1;
+        point_count = 0;
         pointlist_lat.clear();
         pointlist_lon.clear();
 

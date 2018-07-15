@@ -208,7 +208,12 @@ public class landMark extends Activity {
                 AnalysisResult result = gson.fromJson(data, AnalysisResult.class);
                 Log.e("Result = ", String.valueOf(result.categories));
 
-                /*
+                for (Category category: result.categories) {
+//                    landmark_t.setText(("detail : "+category.detail+"\n"));
+                    String land_a = String.valueOf(category.detail);
+                    landmark_t.setText(land_a);
+                }
+/*
                 landmark_t.append("Image format: " + result.metadata.format + "\n");
                 landmark_t.append("Image width: " + result.metadata.width + ", height:" + result.metadata.height + "\n");
                 landmark_t.append("Clip Art Type: " + result.imageType.clipArtType + "\n");
@@ -217,7 +222,6 @@ public class landMark extends Activity {
                 landmark_t.append("Adult score:" + result.adult.adultScore + "\n");
                 landmark_t.append("Is Racy Content:" + result.adult.isRacyContent + "\n");
                 landmark_t.append("Racy score:" + result.adult.racyScore + "\n\n") ;
-                */
                 for (Category category: result.categories) {
                     landmark_t.append("Category: " + category.name + ", score: " + category.score + "\n");
                     landmark_t.append(("detail : "+category.detail+"\n"));
@@ -234,7 +238,6 @@ public class landMark extends Activity {
                     landmark_t.append("No face is detected");
                 }
                 landmark_t.append("\n");
-                /*
                 landmark_t.append("\nDominant Color Foreground :" + result.color.dominantColorForeground + "\n");
                 landmark_t.append("Dominant Color Background :" + result.color.dominantColorBackground + "\n");
 

@@ -31,10 +31,9 @@ public class BaseActivity extends Activity implements View.OnClickListener, Surf
     private RelativeLayout contentView = null;
     public static Context mCtx = null;
 
-    private Camera camera;
+    public Camera camera;
     SurfaceView surfaceView;
     SurfaceHolder surfaceHolder;
-    private Camera mCamera;
 
     Button Btn_Pathview;
     ListView listView;

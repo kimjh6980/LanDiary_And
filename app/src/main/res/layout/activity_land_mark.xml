@@ -26,9 +26,11 @@
             android:layout_marginTop="20dp"
             android:layout_weight="1"
             android:gravity="top|center_horizontal"
-            android:text="TextView"
-            android:background="@color/TextBg_White"
-            android:textSize="30sp" />
+            android:shadowColor="#ffffff"
+            android:shadowRadius="5"
+            android:text="Loading... Please Wait"
+            android:textColor="#ff0900"
+            android:textSize="13sp" />
     </FrameLayout>
 
 </LinearLayout>
