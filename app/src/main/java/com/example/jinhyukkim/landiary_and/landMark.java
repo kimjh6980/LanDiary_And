@@ -34,6 +34,10 @@ import com.microsoft.projectoxford.vision.contract.Category;
 import com.microsoft.projectoxford.vision.contract.Face;
 import com.microsoft.projectoxford.vision.rest.VisionServiceException;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 public class landMark extends Activity {
 
     Bitmap ImageBitmap;
@@ -58,6 +62,9 @@ public class landMark extends Activity {
         landmark_t = findViewById(R.id.landmark_t);
 
         sendTakePhotoIntent();
+        //ResultValue("test");
+
+
     }
 
     private String imageFilePath;
@@ -117,6 +124,7 @@ public class landMark extends Activity {
 
         if (requestCode == 100 && resultCode == RESULT_OK) {
             Bitmap bitmap = BitmapFactory.decodeFile(imageFilePath);
+            /*
             ExifInterface exif = null;
 
             try {
@@ -134,16 +142,15 @@ public class landMark extends Activity {
             } else {
                 exifDegree = 0;
             }
-
-            ((ImageView)findViewById(R.id.camimg)).setImageBitmap(rotate(bitmap, exifDegree));
-            camimg.setImageBitmap(rotate(bitmap, exifDegree));
+*/
+            ((ImageView)findViewById(R.id.camimg)).setImageBitmap(bitmap);
+            //camimg.setImageBitmap(rotate(bitmap, exifDegree));
 
             Drawable d = camimg.getDrawable();
             ImageBitmap = ((BitmapDrawable)d).getBitmap();
             doAnalyze();
         }
     }
-
     private void doAnalyze() {
         try {
             new doRequest().execute();
@@ -152,6 +159,8 @@ public class landMark extends Activity {
             landmark_t.setText("Error encountered. Exception is: " + e.toString());
         }
     }
+
+    String result;
 
     private String process() throws VisionServiceException, IOException {
         Gson gson = new Gson();
@@ -165,10 +174,52 @@ public class landMark extends Activity {
 
         AnalysisResult v = this.client.analyzeImage(inputStream, features, details);
 
-        String result = gson.toJson(v);
-        Log.d("result", result);
+        result = gson.toJson(v);
+        Log.d("result", result);//------------------------------------------------------여기서 값이 뽑히네?
 
+        ResultValue(result);
         return result;
+    }
+
+    private void ResultValue(String data) {
+        Log.e("ResultValue = ", data);
+            Gson gson = new Gson();
+            String land_a = null;
+            //--------------------------------GSON테스트
+            AnalysisResult data2 = gson.fromJson(data, AnalysisResult.class);
+            Log.e("Analysis Result = ", data2.toString());
+            Log.e("Result = ", String.valueOf(data2.categories));
+
+            for (Category category: data2.categories) {
+//                    landmark_t.setText(("detail : "+category.detail+"\n"));
+                land_a = String.valueOf(category.detail);
+            }
+            //land_a = "{landmarks=[{name=Namdaemun, confidence=0.9203275442123413}]}";
+            Log.e("Json Obj = ", land_a);
+            JSONObject json = null;
+            String t3 = "No init";
+            try {
+                json = new JSONObject(land_a);
+                JSONArray t1 = (JSONArray) json.get("landmarks");
+                try {
+                    JSONObject t2 = (JSONObject) t1.getJSONObject(0);
+                     t3 = t2.getString("name");
+                }   catch (JSONException e)    {
+                    t3 = "no landmark";
+                }
+            } catch (JSONException e1) {
+                Log.e("No Data", land_a);
+                //e1.printStackTrace();
+                t3 = "no Data";
+            }
+            final String result = t3;
+
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    landmark_t.setText(String.valueOf(result));
+                }
+            });
     }
 
     private class doRequest extends AsyncTask<String, String, String> {
@@ -180,13 +231,16 @@ public class landMark extends Activity {
 
         @Override
         protected String doInBackground(String... args) {
+            String data = null;
             try {
-                return process();
-            } catch (Exception e) {
-                this.e = e;    // Store error
+                data = process();
+            } catch (VisionServiceException e1) {
+                e1.printStackTrace();
+            } catch (IOException e1) {
+                e1.printStackTrace();
             }
 
-            return null;
+            return data;
         }
 
         @Override
@@ -194,6 +248,9 @@ public class landMark extends Activity {
             super.onPostExecute(data);
             // Display based on error existence
 
+            //ResultValue(data);
+
+            /*
             landmark_t.setText("");
             if (e != null) {
                 landmark_t.setText("Error: " + e.getMessage());
@@ -201,18 +258,31 @@ public class landMark extends Activity {
             } else {
                 Gson gson = new Gson();
                 //--------------------------------GSON테스트
-                /*
+
                 String TT = data;
                 landmark_t.append(data);
-                */
+
                 AnalysisResult result = gson.fromJson(data, AnalysisResult.class);
                 Log.e("Result = ", String.valueOf(result.categories));
 
+                String land_a = null;
                 for (Category category: result.categories) {
 //                    landmark_t.setText(("detail : "+category.detail+"\n"));
-                    String land_a = String.valueOf(category.detail);
-                    landmark_t.setText(land_a);
+                    land_a = String.valueOf(category.detail);
                 }
+                Log.e("Json Obj = ", land_a);
+                JSONObject json = null;
+                try {
+                    json = new JSONObject(land_a);
+                    JSONArray t1 = (JSONArray) json.get("landmarks");
+                    JSONObject t2 = (JSONObject) t1.getJSONObject(0);
+                    String t3 = t2.getString("name");
+                    landmark_t.setText(String.valueOf(t3));
+                } catch (JSONException e1) {
+                    Log.e("No Data", land_a);
+                    e1.printStackTrace();
+                }
+                //String t1 = String.valueOf(json.get("landmarks"));
 /*
                 landmark_t.append("Image format: " + result.metadata.format + "\n");
                 landmark_t.append("Image width: " + result.metadata.width + ", height:" + result.metadata.height + "\n");
@@ -244,7 +314,7 @@ public class landMark extends Activity {
                 landmark_t.append("\n--- Raw Data ---\n\n");
                 landmark_t.append(data);
                 */
-            }
+//            }
         }
     }
 }

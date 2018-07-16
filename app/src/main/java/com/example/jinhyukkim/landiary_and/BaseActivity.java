@@ -36,6 +36,7 @@ public class BaseActivity extends Activity implements View.OnClickListener, Surf
     SurfaceHolder surfaceHolder;
 
     Button Btn_Pathview;
+    Button Capture_btn;
     ListView listView;
     boolean list_status = false;
 
@@ -48,7 +49,7 @@ public class BaseActivity extends Activity implements View.OnClickListener, Surf
         contentView = (RelativeLayout) findViewById(R.id.contentView);
 
         getWindow().setFormat(PixelFormat.UNKNOWN);
-        surfaceView = (SurfaceView) findViewById(R.id.surfaceView);
+        surfaceView = (SurfaceView) findViewById(R.id.sV);
         surfaceHolder = surfaceView.getHolder();
         surfaceHolder.addCallback(this);
         surfaceHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
@@ -81,6 +82,18 @@ public class BaseActivity extends Activity implements View.OnClickListener, Surf
             }
         });
 
+        Capture_btn = (Button)findViewById(R.id.capture_BTN);
+        Capture_btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                camera.stopPreview();
+                camera.release();
+                camera = null;
+                Intent landmark_class = new Intent(getApplicationContext(), landMark.class);
+                startActivity(landmark_class);
+            }
+        });
+
         /*
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -90,6 +103,8 @@ public class BaseActivity extends Activity implements View.OnClickListener, Surf
         });
         */
     }
+
+
 
     @Override
     protected void onResume() {
@@ -155,8 +170,6 @@ public class BaseActivity extends Activity implements View.OnClickListener, Surf
 
     @Override
     public void surfaceDestroyed(SurfaceHolder holder) { // TODO Auto-generated method stub
-        camera.stopPreview();
-        camera.release();
-        camera = null;
+
     }
 }
