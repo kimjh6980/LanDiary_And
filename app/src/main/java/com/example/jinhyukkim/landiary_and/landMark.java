@@ -19,6 +19,8 @@ import android.support.v4.content.FileProvider;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -61,6 +63,10 @@ public class landMark extends Activity {
     String clientId;
     String clientSecret;
 
+    String landmarkUrl;
+
+    Button Btn_Detail;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -79,6 +85,16 @@ public class landMark extends Activity {
 
         sendTakePhotoIntent();
         //ResultValue("test");
+
+        Btn_Detail = findViewById(R.id.Btn_Detail);
+        Btn_Detail.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getApplicationContext(), Landmark_WebView.class);
+                intent.putExtra("url", landmarkUrl);
+                startActivity(intent);
+            }
+        });
 
     }
 
@@ -317,6 +333,7 @@ public class landMark extends Activity {
             JSONObject RspObj = new JSONObject(response.toString());
             JSONArray Rsp_items = new JSONArray(RspObj.getString("items"));
             JSONObject rsp_Value = Rsp_items.getJSONObject(1);
+            landmarkUrl = rsp_Value.getString("link");
             final String Value = rsp_Value.getString("description");
             runOnUiThread(new Runnable() {
                 @Override
