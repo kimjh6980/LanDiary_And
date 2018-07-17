@@ -11,6 +11,9 @@ import android.media.ExifInterface;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Environment;
+import android.os.Handler;
+import android.os.Looper;
+import android.os.Message;
 import android.provider.MediaStore;
 import android.support.v4.content.FileProvider;
 import android.support.v7.app.AppCompatActivity;
@@ -19,10 +22,16 @@ import android.util.Log;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.DataOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -42,12 +51,15 @@ public class landMark extends Activity {
 
     Bitmap ImageBitmap;
     ImageView camimg;
-    TextView landmark_t;
+    TextView landmark_t, landmark_t2;
 
     private VisionServiceClient client;
     private Uri mImageUri;
     private Uri mUriPhotoTaken;
     private File mFilePhotoTaken;
+
+    String clientId;
+    String clientSecret;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,12 +70,15 @@ public class landMark extends Activity {
             client = new VisionServiceRestClient(getString(R.string.subscription_key), getString(R.string.subscription_apiroot));
         }
 
+        clientId = getString(R.string.Client_ID);//애플리케이션 클라이언트 아이디값";
+        clientSecret = getString(R.string.Client_Secret);//애플리케이션 클라이언트 시크릿값";
+
         camimg = findViewById(R.id.camimg);
         landmark_t = findViewById(R.id.landmark_t);
+        landmark_t2 = findViewById(R.id.landmark_t2);
 
         sendTakePhotoIntent();
         //ResultValue("test");
-
 
     }
 
@@ -124,25 +139,6 @@ public class landMark extends Activity {
 
         if (requestCode == 100 && resultCode == RESULT_OK) {
             Bitmap bitmap = BitmapFactory.decodeFile(imageFilePath);
-            /*
-            ExifInterface exif = null;
-
-            try {
-                exif = new ExifInterface(imageFilePath);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-            int exifOrientation;
-            int exifDegree;
-
-            if (exif != null) {
-                exifOrientation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL);
-                exifDegree = exifOrientationToDegrees(exifOrientation);
-            } else {
-                exifDegree = 0;
-            }
-*/
             ((ImageView)findViewById(R.id.camimg)).setImageBitmap(bitmap);
             //camimg.setImageBitmap(rotate(bitmap, exifDegree));
 
@@ -181,6 +177,7 @@ public class landMark extends Activity {
         return result;
     }
 
+    String LandmarkName;
     private void ResultValue(String data) {
         Log.e("ResultValue = ", data);
             Gson gson = new Gson();
@@ -197,29 +194,29 @@ public class landMark extends Activity {
             //land_a = "{landmarks=[{name=Namdaemun, confidence=0.9203275442123413}]}";
             Log.e("Json Obj = ", land_a);
             JSONObject json = null;
-            String t3 = "No init";
+            LandmarkName = "No init";
             try {
                 json = new JSONObject(land_a);
                 JSONArray t1 = (JSONArray) json.get("landmarks");
                 try {
                     JSONObject t2 = (JSONObject) t1.getJSONObject(0);
-                     t3 = t2.getString("name");
+                    LandmarkName = t2.getString("name");
                 }   catch (JSONException e)    {
-                    t3 = "no landmark";
+                    LandmarkName = "no landmark";
                 }
             } catch (JSONException e1) {
                 Log.e("No Data", land_a);
                 //e1.printStackTrace();
-                t3 = "no Data";
+                LandmarkName = "no Data";
             }
-            final String result = t3;
-
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    landmark_t.setText(String.valueOf(result));
+                    landmark_t.setText(LandmarkName);
                 }
             });
+            LandmarkName = "Seoul N Tower";
+            papago(LandmarkName);
     }
 
     private class doRequest extends AsyncTask<String, String, String> {
@@ -247,74 +244,88 @@ public class landMark extends Activity {
         protected void onPostExecute(String data) {
             super.onPostExecute(data);
             // Display based on error existence
+        }
+    }
 
-            //ResultValue(data);
-
-            /*
-            landmark_t.setText("");
-            if (e != null) {
-                landmark_t.setText("Error: " + e.getMessage());
-                this.e = null;
-            } else {
-                Gson gson = new Gson();
-                //--------------------------------GSON테스트
-
-                String TT = data;
-                landmark_t.append(data);
-
-                AnalysisResult result = gson.fromJson(data, AnalysisResult.class);
-                Log.e("Result = ", String.valueOf(result.categories));
-
-                String land_a = null;
-                for (Category category: result.categories) {
-//                    landmark_t.setText(("detail : "+category.detail+"\n"));
-                    land_a = String.valueOf(category.detail);
+    public void papago(String name) {
+        try {
+            String text = URLEncoder.encode(name, "UTF-8");
+            String apiURL = "https://openapi.naver.com/v1/papago/n2mt";
+            URL url = new URL(apiURL);
+            HttpURLConnection con = (HttpURLConnection)url.openConnection();
+            con.setRequestMethod("POST");
+            con.setRequestProperty("X-Naver-Client-Id", clientId);
+            con.setRequestProperty("X-Naver-Client-Secret", clientSecret);
+            // post request
+            String postParams = "source=en&target=ko&text=" + text;
+            con.setDoOutput(true);
+            DataOutputStream wr = new DataOutputStream(con.getOutputStream());
+            wr.writeBytes(postParams);
+            wr.flush();
+            wr.close();
+            int responseCode = con.getResponseCode();
+            BufferedReader br;
+            if(responseCode==200) { // 정상 호출
+                br = new BufferedReader(new InputStreamReader(con.getInputStream()));
+            } else {  // 에러 발생
+                br = new BufferedReader(new InputStreamReader(con.getErrorStream()));
+            }
+            String inputLine;
+            StringBuffer response = new StringBuffer();
+            while ((inputLine = br.readLine()) != null) {
+                response.append(inputLine);
+            }
+            br.close();
+            JSONObject result = new JSONObject(response.toString());
+            JSONObject papago_msg = new JSONObject(result.getString("message"));
+            JSONObject papago_result = new JSONObject(papago_msg.getString("result"));
+            final String papago_translatedText = papago_result.getString("translatedText");
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    landmark_t.setText(papago_translatedText);
                 }
-                Log.e("Json Obj = ", land_a);
-                JSONObject json = null;
-                try {
-                    json = new JSONObject(land_a);
-                    JSONArray t1 = (JSONArray) json.get("landmarks");
-                    JSONObject t2 = (JSONObject) t1.getJSONObject(0);
-                    String t3 = t2.getString("name");
-                    landmark_t.setText(String.valueOf(t3));
-                } catch (JSONException e1) {
-                    Log.e("No Data", land_a);
-                    e1.printStackTrace();
-                }
-                //String t1 = String.valueOf(json.get("landmarks"));
-/*
-                landmark_t.append("Image format: " + result.metadata.format + "\n");
-                landmark_t.append("Image width: " + result.metadata.width + ", height:" + result.metadata.height + "\n");
-                landmark_t.append("Clip Art Type: " + result.imageType.clipArtType + "\n");
-                landmark_t.append("Line Drawing Type: " + result.imageType.lineDrawingType + "\n");
-                landmark_t.append("Is Adult Content:" + result.adult.isAdultContent + "\n");
-                landmark_t.append("Adult score:" + result.adult.adultScore + "\n");
-                landmark_t.append("Is Racy Content:" + result.adult.isRacyContent + "\n");
-                landmark_t.append("Racy score:" + result.adult.racyScore + "\n\n") ;
-                for (Category category: result.categories) {
-                    landmark_t.append("Category: " + category.name + ", score: " + category.score + "\n");
-                    landmark_t.append(("detail : "+category.detail+"\n"));
-                }
+            });
+            encyc(papago_translatedText);
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+    }
 
-                landmark_t.append("\n");
-                int faceCount = 0;
-                for (Face face: result.faces) {
-                    faceCount++;
-                    landmark_t.append("face " + faceCount + ", gender:" + face.gender + "(score: " + face.genderScore + "), age: " + + face.age + "\n");
-                    landmark_t.append("    left: " + face.faceRectangle.left +  ",  top: " + face.faceRectangle.top + ", width: " + face.faceRectangle.width + "  height: " + face.faceRectangle.height + "\n" );
+    public void encyc(String name)    {
+        try {
+            String text = URLEncoder.encode(name, "UTF-8");
+            String apiURL = "https://openapi.naver.com/v1/search/encyc?query="+ text;
+            URL url = new URL(apiURL);
+            HttpURLConnection con = (HttpURLConnection)url.openConnection();
+            con.setRequestMethod("GET");
+            con.setRequestProperty("X-Naver-Client-Id", clientId);
+            con.setRequestProperty("X-Naver-Client-Secret", clientSecret);
+            int responseCode = con.getResponseCode();
+            BufferedReader br;
+            if(responseCode==200) { // 정상 호출
+                br = new BufferedReader(new InputStreamReader(con.getInputStream()));
+            } else {  // 에러 발생
+                br = new BufferedReader(new InputStreamReader(con.getErrorStream()));
+            }
+            String inputLine;
+            StringBuffer response = new StringBuffer();
+            while ((inputLine = br.readLine()) != null) {
+                response.append(inputLine);
+            }
+            br.close();
+            JSONObject RspObj = new JSONObject(response.toString());
+            JSONArray Rsp_items = new JSONArray(RspObj.getString("items"));
+            JSONObject rsp_Value = Rsp_items.getJSONObject(1);
+            final String Value = rsp_Value.getString("description");
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    landmark_t2.setText(Value);
                 }
-                if (faceCount == 0) {
-                    landmark_t.append("No face is detected");
-                }
-                landmark_t.append("\n");
-                landmark_t.append("\nDominant Color Foreground :" + result.color.dominantColorForeground + "\n");
-                landmark_t.append("Dominant Color Background :" + result.color.dominantColorBackground + "\n");
-
-                landmark_t.append("\n--- Raw Data ---\n\n");
-                landmark_t.append(data);
-                */
-//            }
+            });
+        } catch (Exception e) {
+            Log.e("Error = ", String.valueOf(e));
         }
     }
 }
