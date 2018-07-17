@@ -7,6 +7,7 @@ import android.graphics.PixelFormat;
 import android.hardware.Camera;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Surface;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.LayoutInflater;
@@ -58,6 +59,18 @@ public class BaseActivity extends Activity implements View.OnClickListener, Surf
         if (camera != null) {
             try {
                 camera.setPreviewDisplay(surfaceHolder);
+
+                int rotation = getWindowManager().getDefaultDisplay().getRotation();
+                int degrees = 0;
+                switch (rotation) {
+                    case Surface.ROTATION_0: degrees = 0; break;
+                    case Surface.ROTATION_90: degrees = 90; break;
+                    case Surface.ROTATION_180: degrees = 180; break;
+                    case Surface.ROTATION_270: degrees = 270; break;
+                }
+                int result  = (90 - degrees + 360) % 360;
+                camera.setDisplayOrientation(result);
+
                 camera.startPreview();
             } catch (IOException e) {
                 // TODO Auto-generated catch block e.printStackTrace();
@@ -156,6 +169,17 @@ public class BaseActivity extends Activity implements View.OnClickListener, Surf
         if (camera != null) {
             try {
                 camera.setPreviewDisplay(surfaceHolder);
+                int rotation = getWindowManager().getDefaultDisplay().getRotation();
+                int degrees = 0;
+                switch (rotation) {
+                    case Surface.ROTATION_0: degrees = 0; break;
+                    case Surface.ROTATION_90: degrees = 90; break;
+                    case Surface.ROTATION_180: degrees = 180; break;
+                    case Surface.ROTATION_270: degrees = 270; break;
+                }
+                int result  = (90 - degrees + 360) % 360;
+                camera.setDisplayOrientation(result);
+
                 camera.startPreview();
             } catch (IOException e) { // TODO Auto-generated catch block
                 e.printStackTrace();
