@@ -65,7 +65,7 @@ public class landMark extends Activity {
 
     String landmarkUrl;
 
-    Button Btn_Detail;
+    Button Btn_Detail, Btn_Save, Btn_Cancel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -93,6 +93,20 @@ public class landMark extends Activity {
                 Intent intent = new Intent(getApplicationContext(), Landmark_WebView.class);
                 intent.putExtra("url", landmarkUrl);
                 startActivity(intent);
+            }
+        });
+        Btn_Save = findViewById(R.id.Btn_Save);
+        Btn_Save.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+            }
+        });
+        Btn_Cancel = findViewById(R.id.Btn_Cancel);
+        Btn_Cancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
             }
         });
 
