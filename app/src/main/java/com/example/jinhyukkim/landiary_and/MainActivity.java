@@ -188,8 +188,8 @@ public class MainActivity extends BaseActivity implements TMapGpsManager.onLocat
         gps = new TMapGpsManager(MainActivity.this);
         gps.setMinTime(500);
         gps.setMinDistance(2);
-        gps.setProvider(gps.NETWORK_PROVIDER);    //네트워크 검색
-        //gps.setProvider(gps.GPS_PROVIDER);
+        //gps.setProvider(gps.NETWORK_PROVIDER);    //네트워크 검색
+        gps.setProvider(gps.GPS_PROVIDER);
         if(ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)!= PackageManager.PERMISSION_GRANTED
                 && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION)!=PackageManager.PERMISSION_GRANTED){
 
@@ -393,6 +393,13 @@ public class MainActivity extends BaseActivity implements TMapGpsManager.onLocat
                                           ArrayList<TMapPOIItem> arrayList1, TMapPoint tMapPoint, PointF pointF) {
                 Destination_Point = tMapPoint;
 
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        dest_t.setText(Address);
+                    }
+                });
+
                 return false;
             }
         });
@@ -435,6 +442,12 @@ public class MainActivity extends BaseActivity implements TMapGpsManager.onLocat
         });
 
         Toast.makeText(this, "입력하신 주소는 " + Address + " 입니다.", Toast.LENGTH_SHORT).show();
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                dest_t.setText(Address);
+            }
+        });
         builder.setNegativeButton("취소", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
