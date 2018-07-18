@@ -234,32 +234,26 @@ public class landMark extends Activity {
                 try {
                     JSONObject t2 = (JSONObject) t1.getJSONObject(0);
                     LandmarkName = t2.getString("name");
-                    File filePre = new File(path, "TempFile.jpg");
+                    File filePre = new File(imageFilePath);
                     File fileNow = new File(path, LandmarkName+".jpg");
                     String title = "Title";
                     if(filePre.renameTo(fileNow)){
                         title = "Image Created";
+                        papago(LandmarkName);
                     }else{
                         title = "TempFile delete";
-                        TempFile_Delete();
+                        TempFile_Delete(1);
                     }
                     final String finalTitle = title;
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            Toast.makeText(getApplicationContext(), finalTitle, Toast.LENGTH_SHORT).show();
-                        }
-                    });
-
                 }   catch (JSONException e)    {
                     LandmarkName = "no landmark";
-                    TempFile_Delete();
+                    TempFile_Delete(2);
                 }
             } catch (JSONException e1) {
                 Log.e("No Data", land_a);
                 //e1.printStackTrace();
                 LandmarkName = "no Data";
-                TempFile_Delete();
+                TempFile_Delete(3);
             }
             runOnUiThread(new Runnable() {
                 @Override
@@ -267,16 +261,16 @@ public class landMark extends Activity {
                     landmark_t.setText(LandmarkName);
                 }
             });
-            //LandmarkName = "Seoul N Tower";
-            papago(LandmarkName);
+
+
     }
 
-    private void TempFile_Delete() {
+    private void TempFile_Delete(int where) {
         File f = new File(path, "TempFile.jpg");
         if(f.delete())  {
-            Log.e("TempFile", "TempFile Delete");
+            Log.e("TempFile", where + "TempFile Delete");
         }   else    {
-            Log.e("TempFile", "Delete Fail");
+            Log.e("TempFile", where + "Delete Fail");
         }
     }
 

@@ -29,16 +29,20 @@
 
         <activity
             android:name=".MainActivity"
-            android:screenOrientation="portrait">
+            android:screenOrientation="portrait"
+            android:configChanges="orientation|keyboardHidden|screenSize">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".landMark" />
-        <activity android:name=".Landmark_WebView" />
-        <activity android:name=".landmark_Gallery"></activity>
+        <activity android:name=".landMark"
+            android:configChanges="orientation|keyboardHidden|screenSize"/>
+        <activity android:name=".Landmark_WebView"
+            android:configChanges="orientation|keyboardHidden|screenSize"/>
+        <activity android:name=".landmark_Gallery"
+            android:configChanges="orientation|keyboardHidden|screenSize"></activity>
     </application>
 
 </manifest>
