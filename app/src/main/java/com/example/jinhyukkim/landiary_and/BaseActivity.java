@@ -38,6 +38,7 @@ public class BaseActivity extends Activity implements View.OnClickListener, Surf
 
     Button Btn_Pathview;
     Button Capture_btn;
+    Button Gallery_btn;
     ListView listView;
     boolean list_status = false;
 
@@ -107,6 +108,14 @@ public class BaseActivity extends Activity implements View.OnClickListener, Surf
             }
         });
 
+        Gallery_btn = (Button)findViewById(R.id.Gallery_Btn);
+        Gallery_btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent galleryView = new Intent(getApplicationContext(), landmark_Gallery.class);
+                startActivity(galleryView);
+            }
+        });
         /*
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override

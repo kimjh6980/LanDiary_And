@@ -23,6 +23,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
@@ -64,6 +65,7 @@ public class landMark extends Activity {
     String clientSecret;
 
     String landmarkUrl;
+    String path;
 
     Button Btn_Detail, Btn_Save, Btn_Cancel;
 
@@ -84,6 +86,7 @@ public class landMark extends Activity {
         landmark_t2 = findViewById(R.id.landmark_t2);
 
         sendTakePhotoIntent();
+        path = Environment.getExternalStorageDirectory()+"/Android/data/com.example.jinhyukkim.landiary_and/files/Pictures";
         //ResultValue("test");
 
         Btn_Detail = findViewById(R.id.Btn_Detail);
@@ -115,7 +118,7 @@ public class landMark extends Activity {
     private String imageFilePath;
     private File createImageFile() throws IOException {
         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-        String imageFileName = "TEST_" + timeStamp + "_";
+        String imageFileName = "TempFile";
         File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
         File image = File.createTempFile(
                 imageFileName,      /* prefix */
@@ -231,13 +234,32 @@ public class landMark extends Activity {
                 try {
                     JSONObject t2 = (JSONObject) t1.getJSONObject(0);
                     LandmarkName = t2.getString("name");
+                    File filePre = new File(path, "TempFile.jpg");
+                    File fileNow = new File(path, LandmarkName+".jpg");
+                    String title = "Title";
+                    if(filePre.renameTo(fileNow)){
+                        title = "Image Created";
+                    }else{
+                        title = "TempFile delete";
+                        TempFile_Delete();
+                    }
+                    final String finalTitle = title;
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast.makeText(getApplicationContext(), finalTitle, Toast.LENGTH_SHORT).show();
+                        }
+                    });
+
                 }   catch (JSONException e)    {
                     LandmarkName = "no landmark";
+                    TempFile_Delete();
                 }
             } catch (JSONException e1) {
                 Log.e("No Data", land_a);
                 //e1.printStackTrace();
                 LandmarkName = "no Data";
+                TempFile_Delete();
             }
             runOnUiThread(new Runnable() {
                 @Override
@@ -245,8 +267,17 @@ public class landMark extends Activity {
                     landmark_t.setText(LandmarkName);
                 }
             });
-            LandmarkName = "Seoul N Tower";
+            //LandmarkName = "Seoul N Tower";
             papago(LandmarkName);
+    }
+
+    private void TempFile_Delete() {
+        File f = new File(path, "TempFile.jpg");
+        if(f.delete())  {
+            Log.e("TempFile", "TempFile Delete");
+        }   else    {
+            Log.e("TempFile", "Delete Fail");
+        }
     }
 
     private class doRequest extends AsyncTask<String, String, String> {

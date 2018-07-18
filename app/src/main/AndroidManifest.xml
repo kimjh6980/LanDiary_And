@@ -37,7 +37,8 @@
             </intent-filter>
         </activity>
         <activity android:name=".landMark" />
-        <activity android:name=".Landmark_WebView"></activity>
+        <activity android:name=".Landmark_WebView" />
+        <activity android:name=".landmark_Gallery"></activity>
     </application>
 
 </manifest>
