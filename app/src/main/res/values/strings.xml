@@ -1,6 +1,9 @@
 <resources>
     <string name="app_name">LanDiary_And</string>
 
+    <!-- Tmap Api Key -->
+    <string name="TmapApiKey">ef014307-7a24-4125-8ea7-6d7b90c938e6</string>
+
     <!-- Azure Computer Vision Key -->
     <string name="subscription_key">b36e76d728714e1dab91b9247f308746</string>
     <string name="subscription_apiroot">https://japaneast.api.cognitive.microsoft.com/vision/v1.0</string>

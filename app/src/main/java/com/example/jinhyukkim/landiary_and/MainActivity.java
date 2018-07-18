@@ -129,7 +129,7 @@ public class MainActivity extends BaseActivity implements TMapGpsManager.onLocat
 
     private String Address;
 
-    public static String mApiKey = "38c7269d-5eb5-4739-b305-9886986b658f"; // 발급받은 appKey
+    public static String mApiKey;
 
     private static final int[] mArrayMapButton = {
             R.id.btnClickDestination,
@@ -169,6 +169,8 @@ public class MainActivity extends BaseActivity implements TMapGpsManager.onLocat
         setContentView(R.layout.main_activity);
 
         mContext = this;
+
+        mApiKey = getString(R.string.TmapApiKey);
 
         // TmapView setting
         mMapView = new TMapView(this);
@@ -611,6 +613,7 @@ public class MainActivity extends BaseActivity implements TMapGpsManager.onLocat
                 double sx2 = Double.parseDouble(String.format("%.6f",sx));
                 double sy2 = Double.parseDouble(String.format("%.6f",sy));
 
+                Log.e("location =", ex2+"/"+ey2+"/"+sx2+"/"+sy2);
                 //Request Body에 서버에 보낼 데이터 작성
                 final RequestBody requestBody = new FormBody.Builder()
                         .add("endX", String.valueOf(ex2))
@@ -646,7 +649,7 @@ public class MainActivity extends BaseActivity implements TMapGpsManager.onLocat
                         .Builder()
                         .url(url)
                         .header("Content-Type", "application/x-www-form-urlencoded")
-                        .addHeader("appKey", getString(R.string.subscription_key))
+                        .addHeader("appKey",mApiKey)
                         .post(requestBody)
                         .build();
 
@@ -661,6 +664,7 @@ public class MainActivity extends BaseActivity implements TMapGpsManager.onLocat
                         try {
                             responseBody = response.body().string();
                             JSONObject obj = new JSONObject(responseBody);
+                            Log.e("Resp = ", obj.toString());
                             new PathJson(obj);
 
                         } catch (IOException e) {
