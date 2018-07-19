@@ -45,6 +45,7 @@ import com.skt.Tmap.TMapView;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.w3c.dom.Text;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -60,6 +61,8 @@ import okhttp3.Response;
 
 public class MainActivity extends BaseActivity implements TMapGpsManager.onLocationChangedCallback {
 
+    TextView distance_T;
+
     TMapPoint Current_Point;
     double getCurrent_long;
     double getCurrent_lat;
@@ -70,6 +73,8 @@ public class MainActivity extends BaseActivity implements TMapGpsManager.onLocat
     ArrayList<Integer> pointlist_img = new ArrayList<>();
     double set_long;
     double set_lat;
+
+    double distance;
 
     @Override
     public void onLocationChange(Location location) {
@@ -88,6 +93,9 @@ public class MainActivity extends BaseActivity implements TMapGpsManager.onLocat
             LogManager.printLog("getCurrent_lat : " + getCurrent_lat);
             LogManager.printLog("getCurrent_long : " + getCurrent_long);
 
+            if(set_long != 0.0) {
+
+                /*
             Location locA = new Location("current_L");
             locA.setLatitude(getCurrent_lat);
             locA.setLongitude(getCurrent_long);
@@ -95,26 +103,67 @@ public class MainActivity extends BaseActivity implements TMapGpsManager.onLocat
             Location locB = new Location("dest_L");
             locB.setLatitude(set_lat);
             locB.setLongitude(set_long);
+            */
+                double A_lat2 = Double.parseDouble(String.format("%.06f",getCurrent_lat));
+                double A_lon2 = Double.parseDouble(String.format("%.06f",getCurrent_long));
+                double B_lat2 = Double.parseDouble(String.format("%.06f",set_long));
+                double B_lon2 = Double.parseDouble(String.format("%.06f",set_lat));
+                //distance = (locA.distanceTo(locB))/1000000;
+                //distance = DistanceByDegree(locA.getLatitude(), locA.getLongitude(), locB.getLatitude(), locB.getLongitude());
+                //distance = DistanceByDegree(35.141056, 126.934326, 35.139302, 126.934615);
+                //distance = DistanceByDegree(A_lat2, A_lon2, B_lat2, B_lon2);
+                distance = DistanceByDegree(A_lat2, A_lon2, B_lat2, B_lon2);
+                //Log.e("DistanceA_B = ",locA.getLatitude() +"_"+locA.getLongitude() +"/"+ locB.getLatitude() +"_"+ locB.getLongitude() +"="+ String.valueOf(distance));  // 두지점 사이의 거리 ( 만약 다음 포인트까지의 거리가 5m이하일 경우, 포인트를 다음 목적 포인트로 넘기는 작업을 할 예정임ㅒㅔ
+                Log.e("DistanceA_B = ",A_lat2 +"_"+A_lon2 +"/"+ B_lat2 +"_"+ B_lon2 +"="+ String.valueOf(distance));  // 두지점 사이의 거리 ( 만약 다음 포인트까지의 거리가 5m이하일 경우, 포인트를 다음 목적 포인트로 넘기는 작업을 할 예정임ㅒㅔ
 
-            float distance = locA.distanceTo(locB);
-            Log.e("DistanceA_B = ", String.valueOf(distance));  // 두지점 사이의 거리 ( 만약 다음 포인트까지의 거리가 5m이하일 경우, 포인트를 다음 목적 포인트로 넘기는 작업을 할 예정임ㅒㅔ
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        distance_T.setText(String.valueOf(distance));
+                    }
+                });
 
-            Log.e("Point Count ->", point_count +"/"+ set_long +"/"+ set_lat);
-
-            if(distance <= 0.05)    {
-                point_count++;
-                markerPoint();
-                Log.e("Point Count ++ ->", point_count +"/"+ set_long +"/"+ set_lat);
-                Toast.makeText(getApplicationContext(), "point+="+point_count, Toast.LENGTH_SHORT).show();
+                Log.e("Point Count ->", point_count +"/"+ set_long +"/"+ set_lat);
+//6850618.830368369
+                if(distance <= 20)    {
+                    point_count++;
+                    markerPoint();
+                    Log.e("Point Count ++ ->", point_count +"/"+ set_long +"/"+ set_lat);
+                    Toast.makeText(getApplicationContext(), "point+="+point_count, Toast.LENGTH_SHORT).show();
+                }
             }
         }
+
     }
 
+    public double DistanceByDegree(double _latitude1, double _longitude1, double _latitude2, double _longitude2){
+        double theta, dist;
+        theta = _longitude1 - _longitude2;
+        dist = Math.sin(DegreeToRadian(_latitude1)) * Math.sin(DegreeToRadian(_latitude2)) + Math.cos(DegreeToRadian(_latitude1))
+                * Math.cos(DegreeToRadian(_latitude2)) * Math.cos(DegreeToRadian(theta));
+        dist = Math.acos(dist);
+        dist = RadianToDegree(dist);
 
+        dist = dist * 60 * 1.1515;
+        dist = dist * 1.609344;    // 단위 mile 에서 km 변환.
+        dist = dist * 1000.0;      // 단위  km 에서 m 로 변환
+
+        return dist;
+    }
+    //degree->radian 변환
+    public double DegreeToRadian(double degree){
+        return degree * Math.PI / 180.0;
+    }
+
+    //randian -> degree 변환
+    public double RadianToDegree(double radian){
+        return radian * 180d / Math.PI;
+    }
 
     /**
      *  Field declaration
      */
+
     private TMapView	mMapView = null;
     private Context 	mContext;
     private TMapMarkerItem CurrentMarker;
@@ -205,11 +254,11 @@ public class MainActivity extends BaseActivity implements TMapGpsManager.onLocat
         // Insert A SKT Logo on the Tmap.
         mMapView.setTMapLogoPosition(TMapView.TMapLogoPositon.POSITION_BOTTOMRIGHT);
 
-
         A_List = (ListView)findViewById(R.id.itemlistview);
         arrowimg = (ImageView)findViewById(R.id.ArrowImg);
         arrowT = (TextView)findViewById(R.id.ArrowT);
         dest_t = (TextView)findViewById(R.id.Dest_t);
+        distance_T = (TextView)findViewById(R.id.distance);
 
 
     }
@@ -800,50 +849,69 @@ public class MainActivity extends BaseActivity implements TMapGpsManager.onLocat
         //double lat2 = Double.parseDouble(String.format("%.6f",lat));
         //double lon2 = Double.parseDouble(String.format("%.6f",lon));
 
-        set_long = pointlist_lon.get(point_count);
-        set_lat = pointlist_lat.get(point_count);
+        try {
 
-        TMapMarkerItem mapMarkerItem = new TMapMarkerItem();
+            set_long = pointlist_lon.get(point_count+1);
+            set_lat = pointlist_lat.get(point_count+1);
+            Log.e("point Count = ", set_lat +"/"+ set_long);
 
-        TMapPoint tMapPoint = new TMapPoint(set_long, set_lat);
+            TMapMarkerItem mapMarkerItem = new TMapMarkerItem();
 
-        Bitmap bitmap = BitmapFactory.decodeResource(mContext.getResources(), R.drawable.ic_map_no_02);
-        mapMarkerItem.setIcon(bitmap);
-        mapMarkerItem.setPosition(0.5f, 0.5f);
-        mapMarkerItem.setTMapPoint(tMapPoint);
-        mapMarkerItem.setName(String.valueOf(point_count));
-        mMapView.addMarkerItem("mapMarkerItem", mapMarkerItem);
+            TMapPoint tMapPoint = new TMapPoint(set_long, set_lat);
 
-        final Drawable drawableimg;
+            Bitmap bitmap = BitmapFactory.decodeResource(mContext.getResources(), R.drawable.ic_map_no_02);
+            mapMarkerItem.setIcon(bitmap);
+            mapMarkerItem.setPosition(0.5f, 0.5f);
+            mapMarkerItem.setTMapPoint(tMapPoint);
+            mapMarkerItem.setName(String.valueOf(point_count));
+            mMapView.addMarkerItem("mapMarkerItem", mapMarkerItem);
 
-        switch (String.valueOf(pointlist_img.get(point_count)))   {
-            case "0":
-                drawableimg = getResources().getDrawable(R.drawable.a_0);
-                break;
-            case "11":
-                drawableimg = getResources().getDrawable(R.drawable.a_11);
-                break;
-            case "12":
-                drawableimg = getResources().getDrawable(R.drawable.a_12);
-                break;
-            case "13":
-                drawableimg = getResources().getDrawable(R.drawable.a_13);
-                break;
-            case "14":
-                drawableimg = getResources().getDrawable(R.drawable.a_14);
-                break;
-            default:
-                drawableimg = getResources().getDrawable(R.drawable.a_etc);
-                break;
+            final Drawable drawableimg;
+
+            switch (String.valueOf(pointlist_img.get(point_count)))   {
+                case "0":
+                    drawableimg = getResources().getDrawable(R.drawable.a_0);
+                    break;
+                case "11":
+                    drawableimg = getResources().getDrawable(R.drawable.a_11);
+                    break;
+                case "12":
+                    drawableimg = getResources().getDrawable(R.drawable.a_12);
+                    break;
+                case "13":
+                    drawableimg = getResources().getDrawable(R.drawable.a_13);
+                    break;
+                case "14":
+                    drawableimg = getResources().getDrawable(R.drawable.a_14);
+                    break;
+                default:
+                    drawableimg = getResources().getDrawable(R.drawable.a_etc);
+                    break;
+            }
+
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    arrowT.setText(adapter.getM(point_count));
+                    arrowimg.setImageDrawable(drawableimg);
+                }
+            });
+        }catch (IndexOutOfBoundsException e)    {
+            String Toastmsg = "no data";
+            if(point_count == 0)    {
+                Toastmsg = "no path";
+            }   else    {
+                Toastmsg = "Destination endpoint";
+            }
+            final String finalToastmsg = Toastmsg;
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    Toast.makeText(mContext, finalToastmsg, Toast.LENGTH_SHORT).show();
+                }
+            });
         }
 
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                arrowT.setText(adapter.getM(point_count));
-                arrowimg.setImageDrawable(drawableimg);
-            }
-        });
 
 
     }
