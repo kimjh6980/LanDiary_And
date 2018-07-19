@@ -225,7 +225,12 @@ public class landMark extends Activity {
                 land_a = String.valueOf(category.detail);
             }
             //land_a = "{landmarks=[{name=Namdaemun, confidence=0.9203275442123413}]}";
+        try {
             Log.e("Json Obj = ", land_a);
+        } catch (NullPointerException e)  {
+            Log.e("Json Obj = ", "NULL??");
+        }
+
             JSONObject json = null;
             LandmarkName = "No init";
             try {
@@ -234,6 +239,7 @@ public class landMark extends Activity {
                 try {
                     JSONObject t2 = (JSONObject) t1.getJSONObject(0);
                     LandmarkName = t2.getString("name");
+                    Log.e("File === ", imageFilePath +"/"+ path +"///"+ LandmarkName);
                     File filePre = new File(imageFilePath);
                     File fileNow = new File(path, LandmarkName+".jpg");
                     String title = "Title";
@@ -266,11 +272,11 @@ public class landMark extends Activity {
     }
 
     private void TempFile_Delete(int where) {
-        File f = new File(path, "TempFile.jpg");
+        File f = new File(imageFilePath);
         if(f.delete())  {
-            Log.e("TempFile", where + "TempFile Delete");
+            Log.e("TempFile", where +"/"+path+"/"+imageFilePath+"/"+ "TempFile Delete");
         }   else    {
-            Log.e("TempFile", where + "Delete Fail");
+            Log.e("TempFile", where+path+"/"+imageFilePath+"/"+ "Delete Fail");
         }
     }
 
